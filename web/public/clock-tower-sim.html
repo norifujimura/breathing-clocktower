@@ -13,7 +13,7 @@
     <input type="range" min="0" max="100" value="50" class="slider" id="brightness">
     <input id="files" type="file">
     <output id="list"></output>
-    <canvas id="canvasTwo"></canvas>
+    <canvas id="canvasTwo" height= '300'></canvas>
     <script>
 
 var myCanvas;
@@ -21,8 +21,9 @@ var lady;
 //var img;
 
 let w = 12;
-let h = 145;
-let pitch = 1.66;
+//let h = 145;
+let h = 300;
+let pitch = 1;
 
 let pixels =[];
 
@@ -179,7 +180,7 @@ function lightDots(){
 
   var r = 50;
   for(var j=0;j<h;j++){
-    var y = - 240+j*pitch ;
+    var y = - (h*pitch)+j*pitch ;
     
     for(var i=0;i<w;i++){
       angle = i* (360/24)+(360/48);
@@ -199,7 +200,7 @@ function lightDots(){
         rotate(-angle,[0,1,0]);
         translate(r,y,0);
         emissiveMaterial(c2);
-        box(3,1.66,3);
+        box(3,pitch,3);
       pop();
       
         
@@ -225,7 +226,7 @@ function lightDotsReflection(){
 
   var r = 50;
   for(var j=0;j<h;j++){
-    var y = 240-j*pitch ;
+    var y = (h*pitch)-j*pitch ;
     
     for(var i=0;i<w;i++){
       angle = i* (360/24)+(360/48);
@@ -291,7 +292,7 @@ function screenShot(){
                 return function(e) {
                 var span = document.createElement('span')
                 span.innerHTML = ['<img class="thumb"src="', e.target.result,
-                '"title="', escape(theFile.name), '" height="200" />'
+                '"title="', escape(theFile.name), '" height="240" />'
                 ].join('')
                 document.getElementById('list').insertBefore(span, null)
                 getInfo(e.target.result)
@@ -306,8 +307,10 @@ function screenShot(){
         var ctxt = canvasTwo.getContext('2d');
         var img = new Image;
         img.src = pic;
+
         img.onload = function() {
             alert("onload");
+            //ctxt.drawImage(img,0,0,w,h);
             ctxt.drawImage(img,0,0,w,h);
             //var data = ctxt.getImageData(0,0,img.width, img.height).data;
             var data = ctxt.getImageData(0,0,w,h).data;

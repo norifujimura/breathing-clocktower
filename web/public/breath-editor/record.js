@@ -13,6 +13,8 @@ let w = 1000;
 let h = 500;
 var c ;
 
+var state = "init";//init,reading,read
+
 //window.onload = setup;
 
 function setup(){
@@ -28,12 +30,17 @@ function setup(){
     myCanvas.parent('recorderCanvas');
 
     //createCanvas(w, h);
+    background(10);
 }
 
 function draw(){
     //console.log("Draw")
 
-    background(10);
+    if(state == "reading"){
+        return;
+    }
+
+    //background(10);
   
     drawDots();
     //drawLight();
@@ -57,9 +64,13 @@ function drawLight(){
     ellipse(w/2, h/4*3, 20);
 }
   
-function drawDots(){
+function drawDots(){    
     
     // draw lines
+
+    if(state == "reading"){
+        return;
+    }
 
     if(data.length<1){
         return;
@@ -71,7 +82,24 @@ function drawDots(){
         l = data.length;
     }
 
-    for(let i =0; i < l; i++){
+    let distance = Math.abs((data.array[data.length-1] - data.basePressure));
+    let percent = distance /100;
+
+    if(percent<0){
+        percent = 0;
+    }else if(percent>1){
+        return;
+    }
+
+    background(10);
+
+    noStroke();
+    c = color(255,255,255,5+250*percent);
+    fill(c);
+    //ellipse(w/2, h/2, w, h);
+    ellipse(w/2, h/2, h, h);
+
+    for(var i =0; i < l; i++){
         //let x = i * (width / (numPts-1));
         let x = i
         let y = (h/2) - (data.array[data.length-i] - data.basePressure) ;
@@ -81,20 +109,25 @@ function drawDots(){
         let percent = distance /100;
 
         noStroke();
+        if(percent>1){
+            percent = 0;
+        }
         c = color(255,255,255,5+250*percent);
         
         fill(c);
         ellipse(x, y, 7);
+        /*
+        if(i == 0){
+            ellipse(w/2, h/2, h, h);
+        }
+            */
     } 
 
-    let distance = Math.abs((data.array[data.length-1] - data.basePressure));
-    let percent = distance /100;
-
-    noStroke();
-    c = color(255,255,255,5+250*percent);
-    fill(c);
-    ellipse(w/2, h/2, w, h);
+    if(state == "reading"){
+        return;
+    }
     
+
 }
 
 function updateData(base,d){
@@ -122,10 +155,26 @@ function updateData(base,d){
     data.basePressure = base;
 }
 
+function resetData(){
+
+    var tempBasePressure = data.basePressure;
+
+    data ={
+        array:[],
+        length:0,
+        milliseconds:0,
+        high:0,
+        low:200000,
+        basePressure:tempBasePressure
+    }
+}
+
 async function openPort(){
     console.log("Open");
     // Prompt user to select any serial port.
     const port = await navigator.serial.requestPort();
+
+
     // Wait for the serial port to open.
     await port.open({ baudRate: 250000 });
 
@@ -152,6 +201,8 @@ async function openPort(){
         //pass if empty
         if(v != ''){
             if(v.slice( -1 ) == '\n'){
+                state = "reading";
+
                 //add is it ends with \n
                 v = buffer + v;
                 v = v.replace("\n", "");
@@ -169,12 +220,19 @@ async function openPort(){
                 //console.log("base:"+basePressure+" pressure:"+pressure+"\n");
 
                 buffer = "";
+                state = "read";
             }else{
                 //wait if not 
                 buffer = v;
             }
         }
     }
+}
+
+async function closePort(){
+    console.log("Close");
+    const port = await navigator.serial.requestPort();
+    await port.close();
 }
 
 /*

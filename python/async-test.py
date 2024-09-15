@@ -7,6 +7,14 @@ import sys
 import asyncio
 import time
 
+import json
+from ctypes import *
+from bleak import BleakClient
+
+address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8" # CHARACTERISTIC_UUID
+
+
 x = 0
 y = 0
 
@@ -16,12 +24,37 @@ async def say_after(delay, what):
     print(f"{what} at {time.strftime('%X')}")
 
 async def my_loop(delay, what):
+    global x,y
     while True:
         # return rateを1 Hzに設定
-        print(f"prepare {what} at {time.strftime('%X')}")
+        print(f"{what} x: {x}  y: {y} at {time.strftime('%X')}")
         await asyncio.sleep(delay)
 
+async def ble_json(address,delay):
+    global x,y
+    async with BleakClient(address) as client:
+        message_received = await client.read_gatt_char(CHARACTERISTIC_UUID)
+        print("message_received : {0}".format("".join(map(chr, message_received ))))
+        
+        #info = "{\"x\": \"100\",\"y\":\"100\"}" # put your large data here
+        #length = len(info)
+        #factory_info_bytes = create_string_buffer(info.encode('utf-8'), length)
+        
+        while True:
+
+            message = {
+                "x":x,
+                "y":y
+            }
+            
+            #masseage_b = json.dumps(message).encode('utf-8')
+            masseage_b = json.dumps(message).encode('utf-8')
+            # return rateを1 Hzに設定
+            await client.write_gatt_char(CHARACTERISTIC_UUID,masseage_b,response=True)
+            await asyncio.sleep(delay)
+
 async def pygame_loop(delay):
+    global x,y
     pygame.init() # 初期化
     screen = pygame.display.set_mode((120,120)) # ウィンドウサイズの指定
     pygame.display.set_caption("Pygame Test") # ウィンドウの上の方に出てくるアレの指定
@@ -37,6 +70,8 @@ async def pygame_loop(delay):
         pygame.draw.line(screen, (0,0,0), (0,mouseY), (120,mouseY), 1)
         pygame.display.flip()
         #pygame.display.update() # 画面更新
+        x = mouseX
+        y = mouseY
 
         for event in pygame.event.get(): # 終了処理
             if event.type == QUIT:
@@ -50,6 +85,7 @@ async def main():
     task1 = asyncio.create_task(my_loop(1, 'hello'))
     task2 = asyncio.create_task(my_loop(2, 'world'))
     task3 = asyncio.create_task(pygame_loop(0.02))
+    task4 = asyncio.create_task(ble_json(address,0.02))
 
 
     print(f"started at {time.strftime('%X')}")

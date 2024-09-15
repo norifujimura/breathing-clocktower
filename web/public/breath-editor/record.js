@@ -1,4 +1,5 @@
 var data ={
+    type:'pressure',
     array:[],
     length:0,
     milliseconds:0,

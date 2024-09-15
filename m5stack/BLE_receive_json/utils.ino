@@ -65,7 +65,7 @@ void showName(){
 
 void showValue(){
   M5.Lcd.clear();
-  M5.Lcd.fillRect(x+160, y+120, 4, 4, WHITE);
+  M5.Lcd.fillRect(x, y, 4, 4, WHITE);
 
   M5.Lcd.setCursor(0, 240-40);
   M5.Lcd.setTextSize(2);

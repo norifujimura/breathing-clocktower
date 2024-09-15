@@ -52,7 +52,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
       Serial.println("onWrite");
       //char json[] = pCharacteristic->getValue();
-      std::string values = pCharacteristic->getValue();
+      //std::string values = pCharacteristic->getValue();
 
       /*
       if (values.length() == 2){
@@ -81,7 +81,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       showValue();
       sendAlive(pCharacteristic);
       
-
+      Serial.println(x);
+      Serial.println(y);
 
 
       /*

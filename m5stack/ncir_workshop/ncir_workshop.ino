@@ -47,7 +47,7 @@ void setup() {
   M5.begin();
   M5.lcd.setTextSize(2); 
   Wire.begin();
-  Serial.begin(115200);
+  Serial.begin(9600);
 
     Wire.beginTransmission(
       0x5A);  // Send Initial Signal and I2C Bus Address  发送初始信号和I2C总线地址

@@ -1,11 +1,15 @@
+
 var data ={
+    type:'ncir',
     array:[],
     length:0,
     milliseconds:0,
     high:0,
     low:200000,
-    basePressure:0
+    temp:0,
+    baseTemp:0
 }
+
 var startTime;
 //var centerValue;
 var string = "";
@@ -13,10 +17,12 @@ let w = 1000;
 let h = 500;
 var c ;
 
+var state = "init";//init,reading,read
 //window.onload = setup;
 
 function setup(){
     console.log("Setup")
+    frameRate(20);
     if ("serial" in navigator) {
         // The Web Serial API is supported.
         console.log("Serial is supported")
@@ -33,7 +39,9 @@ function setup(){
 function draw(){
     //console.log("Draw")
 
-    background(10);
+    if(state == "reading"){
+        return;
+    }
   
     drawDots();
     //drawLight();
@@ -58,8 +66,14 @@ function drawLight(){
 }
   
 function drawDots(){
-    
+    //console.log("drawDots l = "+data.length);
     // draw lines
+
+    let ratio = 5;
+
+    if(state == "reading"){
+        return;
+    }
 
     if(data.length<1){
         return;
@@ -71,33 +85,56 @@ function drawDots(){
         l = data.length;
     }
 
-    for(let i =0; i < l; i++){
-        //let x = i * (width / (numPts-1));
-        let x = i
-        let y = (h/2) - (data.array[data.length-i] - data.basePressure) ;
-        let distance = Math.abs((data.array[data.length-i] - data.basePressure));
-        //console.log("distance:"+distance+"\n");
-
-        let percent = distance /100;
-
-        noStroke();
-        c = color(255,255,255,5+250*percent);
-        
-        fill(c);
-        ellipse(x, y, 7);
-    } 
-
-    let distance = Math.abs((data.array[data.length-1] - data.basePressure));
+    let temp = (data.array[data.length-i] - data.baseTemp) * ratio;
+    let distance = Math.abs(temp);
     let percent = distance /100;
+
+    if(percent<0){
+        percent = 0;
+    }else if(percent>1){
+        return;
+    }
+
+    background(10);
 
     noStroke();
     c = color(255,255,255,5+250*percent);
     fill(c);
-    ellipse(w/2, h/2, w, h);
+    //ellipse(w/2, h/2, w, h);
+    ellipse(w/2, h/2, h, h);
+
+
+    for(let i =0; i < l; i++){
+        //console.log("drawDots i = "+i);
+        //let x = i * (width / (numPts-1));
+        let x = i
+        let temp = (data.array[data.length-i] - data.baseTemp) * ratio;
+        let y = (h/2) - temp;
+        let distance = Math.abs(temp);
+        //console.log("distance:"+distance+"\n");
+
+        let percent = distance /100;
+        if(percent>1){
+            percent = 1;
+        }
+
+        noStroke();
+        c = color(255,255,255,5+250*percent);
+        //c = color(255,255,255,255);
+        fill(c);
+        ellipse(x, y, 7);
+    } 
     
 }
 
+
 function updateData(base,d){
+    //console.log("UpdateData");
+    if((data.baseTemp - base)>0.9 && (data.baseTemp - base)%10 == 0) {
+        return;
+    }
+
+    data.temp = d;
     data.array.push(d);
     data.length = data.array.length;
     if(d>data.high){
@@ -119,16 +156,30 @@ function updateData(base,d){
     }
     //centerValue = sum / l;
     //centerValue = base;
-    data.basePressure = base;
+    data.baseTemp = base;
+}
+
+function resetData(){
+
+    var tempBaseTemp= data.baseTemp;
+
+    data ={
+        array:[],
+        length:0,
+        milliseconds:0,
+        high:0,
+        low:200000,
+        baseTemp:tempBaseTemp
+    }
 }
 
 async function openPort(){
-    console.log("Open");
+    console.log("Open1");
     // Prompt user to select any serial port.
     const port = await navigator.serial.requestPort();
     // Wait for the serial port to open.
-    await port.open({ baudRate: 250000 });
-
+    await port.open({ baudRate: 9600 });
+    console.log("Open2");
     //const reader = port.readable.getReader();
 
     const textDecoder = new TextDecoderStream();
@@ -152,23 +203,29 @@ async function openPort(){
         //pass if empty
         if(v != ''){
             if(v.slice( -1 ) == '\n'){
+                state = "reading";
+
                 //add is it ends with \n
                 v = buffer + v;
                 v = v.replace("\n", "");
 
                 var valueArray = v.split(",");
 
-                var basePressure = parseFloat(valueArray[0]);
-                var pressure = parseFloat(valueArray[1]);
-                if(basePressure  != null){
-                    updateData(basePressure, pressure);
+                var baseTemp = parseFloat(valueArray[0]);
+                var temp = parseFloat(valueArray[1]);
+                if(baseTemp  != null && temp  != null){
+                    if(baseTemp>10){
+                        updateData(baseTemp, temp);
+                    }
+                    
                 }
                 
                 //string += v;
-                //console.log(v+"\n");
-                //console.log("base:"+basePressure+" pressure:"+pressure+"\n");
+                console.log(v+"\n");
+                console.log("base:"+baseTemp+" temp:"+temp+"\n");
 
                 buffer = "";
+                state = "read";
             }else{
                 //wait if not 
                 buffer = v;

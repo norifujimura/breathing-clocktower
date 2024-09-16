@@ -4,7 +4,7 @@
 */
 
 #include <M5Unified.h>
-//#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>
 
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -19,11 +19,23 @@
 BLEAdvertising *pAdvertising;
 
 std::string stdBleName;
-String bleName = "08";
+String bleName = "00";
+
+//https://arduino.stackexchange.com/questions/8457/serial-read-vs-serial-readbytes
+
+//LED
+int ledPin = 2;//core2: 32
+int ledBrightness = 255;
+int ledLength = 300;  //300 for 5m. 60 for 1m
+
+Adafruit_NeoPixel strip(ledLength, ledPin, NEO_GRBW + NEO_KHZ800);
+
+//
 
 int value;
 int x;
 int y;
+int brightness;
 /*
 
 //bool isReceived=false;
@@ -44,6 +56,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string values = pCharacteristic->getValue();
+
       if (values.length() > 0) {
         Serial.println("*********");
         Serial.print("New value2x: ");
@@ -72,6 +85,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
         x=int(values[0]);
         y=int(values[1]);
+
+        brightness = round(255.0/120.0 * y);
         
         showValue();
 

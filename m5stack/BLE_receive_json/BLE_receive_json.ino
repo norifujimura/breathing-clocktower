@@ -79,7 +79,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       y = doc["y"];
       
       showValue();
-      sendAlive(pCharacteristic);
+      //sendAlive(pCharacteristic);
       
       Serial.println(x);
       Serial.println(y);
@@ -161,6 +161,7 @@ void setup() {
                                          BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
+
 
   pCharacteristic->setCallbacks(new MyCallbacks());
 

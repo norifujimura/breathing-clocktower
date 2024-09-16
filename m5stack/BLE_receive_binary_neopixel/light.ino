@@ -25,4 +25,13 @@ void showLED(){
   strip.show();  
 }
 
+void showLEDBytes(){
+  for(int i=0; i<ledLength ;i++){
+
+    uint32_t  c = strip.Color(0,0,0,buf[i]);
+    strip.setPixelColor(i, c);         //  Set pixel's color (in RAM)
+  }
+  strip.show(); 
+}
+
 

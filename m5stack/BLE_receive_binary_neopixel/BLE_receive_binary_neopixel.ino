@@ -25,10 +25,13 @@ String bleName = "00";
 
 //LED
 int ledPin = 2;//core2: 32
-int ledBrightness = 255;
-int ledLength = 120;  //300 for 5m. 60 for 1m
+int ledBrightness = 200;
+const int ledLength = 120;  //300 for 5m. 60 for 1m
 
 Adafruit_NeoPixel strip(ledLength, ledPin, NEO_GRBW + NEO_KHZ800);
+
+//https://qiita.com/hikoalpha/items/c4931230bebdf3c3955b
+uint8_t buf[ledLength];
 
 //
 
@@ -36,6 +39,8 @@ int value;
 int x;
 int y;
 int brightness;
+
+bool isReceived = false;
 /*
 
 //bool isReceived=false;
@@ -52,6 +57,9 @@ static void setLight();
 */
 static void showValue();
 static void showLED();
+
+static void showValueBytes();
+static void showLEDBytes();
 
 class MyCallbacks: public BLECharacteristicCallbacks {
     
@@ -71,7 +79,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       
 
       if (values.length() == 2){
-
+       
         /*
         int plusMinus=int(values[0]);
         int  v=int(values[1]);
@@ -90,7 +98,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         brightness = round(255.0/120.0 * y);
         
         showValue();
-        showLED();
+        //showLED();
+        isReceived = true;
 
         Serial.println(x);
         Serial.println(y);
@@ -99,6 +108,13 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         //setLight();
         //setLight(0,255,0,255);
         //isReceived = true;
+      }else if (values.length() == ledLength){
+        for(int i = 0;i<ledLength;i++){
+          buf[i] = int(values[i]);
+        }
+        showValueBytes();
+        //showLEDBytes();
+        isReceived = true;
       }
     }
 };
@@ -152,11 +168,11 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   pAdvertising->start();
-  delay(60);
-  /*
+  delay(40);
+  
   if(isReceived){
-    showRGBW();
+    showLEDBytes();
     isReceived = false;
   }
-  */
+  
 }

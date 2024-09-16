@@ -29,6 +29,17 @@ void showName(){
   M5.Lcd.print(bleName);
 }
 
+void showValueBytes(){
+  M5.Lcd.clear();
+  for(int i = 0;i<ledLength;i++){
+    int w;
+    w = buf[i];
+    uint16_t wColor = 0;
+    wColor = M5.Lcd.color565(w,w,w);
+    M5.Lcd.drawLine(i, 0,i,120,wColor); 
+  }
+}
+
 void showValue(){
 
   M5.Lcd.clear();

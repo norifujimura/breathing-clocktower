@@ -1,4 +1,4 @@
-from p5 import *
+#from p5 import *
 
 import json
 import asyncio
@@ -53,7 +53,7 @@ async def send(client):
         
 #task1 = asyncio.create_task(connect(address))
 #p5.run(frame_rate=20)
-
+'''
 def setup():
     
     #normalize()
@@ -91,6 +91,7 @@ def draw():
 def key_pressed(event):
 
     background(204)
+'''
 
 #asyncio.run(main(address))
 #await main(address)
@@ -100,7 +101,7 @@ def key_pressed(event):
 # use "skia" for better 2D experience
 # Default renderer is set to "vispy"
 
-run(renderer="vispy",frame_rate=20) # "skia" is still in beta
+#run(renderer="vispy",frame_rate=20) # "skia" is still in beta
 
 async def ble(address, loop):
     async with BleakClient(address, loop=loop) as client:

@@ -26,7 +26,7 @@ String bleName = "00";
 //LED
 int ledPin = 2;//core2: 32
 int ledBrightness = 255;
-int ledLength = 300;  //300 for 5m. 60 for 1m
+int ledLength = 120;  //300 for 5m. 60 for 1m
 
 Adafruit_NeoPixel strip(ledLength, ledPin, NEO_GRBW + NEO_KHZ800);
 
@@ -51,6 +51,7 @@ static void showRGBW();
 static void setLight();
 */
 static void showValue();
+static void showLED();
 
 class MyCallbacks: public BLECharacteristicCallbacks {
     
@@ -89,6 +90,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         brightness = round(255.0/120.0 * y);
         
         showValue();
+        showLED();
 
         Serial.println(x);
         Serial.println(y);

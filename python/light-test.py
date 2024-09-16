@@ -11,7 +11,8 @@ import json
 from ctypes import *
 from bleak import BleakClient
 
-address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+#address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+address = "24:58:7C:5C:83:DD"
 CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8" # CHARACTERISTIC_UUID
 
 

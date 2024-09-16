@@ -31,7 +31,7 @@ const int ledLength = 120;  //300 for 5m. 60 for 1m
 Adafruit_NeoPixel strip(ledLength, ledPin, NEO_GRBW + NEO_KHZ800);
 
 //https://qiita.com/hikoalpha/items/c4931230bebdf3c3955b
-uint8_t buf[ledLength];
+uint8_t buf[ledLength*3];
 
 //
 
@@ -41,6 +41,7 @@ int y;
 int brightness;
 
 bool isReceived = false;
+String mode = "";
 /*
 
 //bool isReceived=false;
@@ -66,6 +67,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string values = pCharacteristic->getValue();
 
+      /*
       if (values.length() > 0) {
         Serial.println("*********");
         Serial.print("New value2x: ");
@@ -76,10 +78,10 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         Serial.println();
         Serial.println("*********");
       }
-      
+      */
 
       if (values.length() == 2){
-       
+       mode = "xy";
         /*
         int plusMinus=int(values[0]);
         int  v=int(values[1]);
@@ -109,7 +111,16 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         //setLight(0,255,0,255);
         //isReceived = true;
       }else if (values.length() == ledLength){
+        mode = "white";
         for(int i = 0;i<ledLength;i++){
+          buf[i] = int(values[i]);
+        }
+        showValueBytes();
+        //showLEDBytes();
+        isReceived = true;
+      }else if (values.length() == ledLength*3){
+        mode = "rgb";
+        for(int i = 0;i<ledLength*3;i++){
           buf[i] = int(values[i]);
         }
         showValueBytes();

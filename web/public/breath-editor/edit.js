@@ -4,14 +4,14 @@ var state = "init"
 let dataWindowWidth= 2000;
 let w = 1000;
 let h = 500;
-let hPlus = 50;
+//let hPlus = 50;
 //let offset = 0;
 //let offsetMax = 0;
 
 var fps = 20;
 var dataPlayPos= 0;//0 to w
 
-var ratioElem,offsetElem,warmPeakElem,coolPeakElem,warmElem,coolElem,checkElem,whiteMaxElem,whiteMinElem;
+var ratioElem,offsetElem,warmPeakElem,coolPeakElem,warmElem,coolElem,checkElem,whiteMaxElem,whiteMinElem,baseAdjustElem;
 var characteristicOne,characteristicTwo;
 var isNewColor = true;
 
@@ -19,32 +19,40 @@ function setup(){
     console.log("Setup")
     frameRate(fps);
 
-    var myCanvas = createCanvas(w,h+hPlus);
+    var myCanvas = createCanvas(w,h);
     myCanvas.parent('viewCanvas');
 
+    baseAdjustElem = document.getElementById('baseAdjust'); 
     ratioElem = document.getElementById('ratio'); 
     offsetElem = document.getElementById('offset'); // input要素
 
+    baseAdjustElem.addEventListener('input', onBaseAdjust); 
     ratioElem.addEventListener('input', onRatio); 
     offsetElem.addEventListener('input', onOffset); 
 
+    /*
     warmPeakElem = document.getElementById('warmPeak');
     coolPeakElem = document.getElementById('coolPeak');
     warmPeakElem.addEventListener('input', onWarmPeak); 
     coolPeakElem.addEventListener('input', onCoolPeak); 
+    */
 
     warmElem = document.getElementById('warm'); // input要素
     coolElem = document.getElementById('cool'); // input要素
     warmElem.addEventListener('input', onWarm,false); 
     coolElem.addEventListener('input', onCool,false); 
 
+    /*
     checkElem = document.getElementById('check');  
     checkElem.addEventListener('input', onColor,false); 
+    */
 
+    /*
     whiteMaxElem = document.getElementById('whiteMax'); 
     whiteMinElem = document.getElementById('whiteMin'); 
     whiteMaxElem.addEventListener('input', onWhiteMax,false); 
     whiteMinElem.addEventListener('input', onWhiteMin,false); 
+    */
 
     isNewColor = true;
     
@@ -79,21 +87,28 @@ function draw(){
         
         background(10);
         drawDots();
+        drawLine();
         drawCursorLine();
+        drawBaseCenterLine();
         //drawPeakLineWhite();
-        drawLinesWhite();
-        drawLinesColors();
-        //drawPeakLineRGB();
-        drawWhite();
-        drawColors();
+        //drawLinesWhite();
 
-        send(true);
-        send(false);
+        //drawLinesColors();
+
+        //drawPeakLineRGB();
+        //drawWhite();
+
+        //drawColors();
+
+        //send(true);
+       // send(false);
     }
 }
 
 function showParameters(){
-    document.getElementById('name').textContent = "name:"+data.name;
+    //document.getElementById('name').textContent = "name:"+data.name.full+" jp:"+data.name.jp+" en:"+data.name.en;
+    document.getElementById('name').textContent = "name:"+data.name_full+ " ja:"+data.name_jp+ " en:"+data.name_en;
+    document.getElementById('type').textContent = "type:"+data.type;
     document.getElementById('version').textContent = "version:"+data.version;
     document.getElementById('length').textContent = "length:"+data.length;
     document.getElementById('milliseconds').textContent = "milliseconds:"+data.milliseconds;
@@ -103,34 +118,64 @@ function showParameters(){
     document.getElementById('basePressure').textContent = "basePressure:"+data.basePressure;
     document.getElementById('fps').textContent = "FPS:"+fps + " data-width/fps = "+ dataWindowWidth / fps +"sec";
 
+    document.getElementById('baseAdjustLabel').textContent = "Base Adjust:"+data.basePressureAdjust;
     document.getElementById('ratiotLabel').textContent = "Ratio:"+data.ratio;
     document.getElementById('offsetLabel').textContent = "Offset:"+data.offset;
+    /*
     document.getElementById('warmPeakLabel').textContent = "Warm peak:"+data.warm.peak;
     document.getElementById('coolPeakLabel').textContent = "Cool peak:"+data.cool.peak;
-
     document.getElementById('whiteMaxLabel').textContent = "White Max:"+data.white.max;
     document.getElementById('whiteMinLabel').textContent = "White Min:"+data.white.min;
+    */
 }
 
 function drawDots(){
-    let ratio = w/dataWindowWidth;
+    //let ratio = w/dataWindowWidth;
 
     for(let i = 0; i < dataWindowWidth; i++){
         let dataPos  = i+data.offset;
         let x = i;
-        let rgbw = getRGBW(dataPos);
-        let y = h - rgbw.value; //0,0 is left-up
+        let rgb = getRGB(dataPos);
+        let y = h/2 - rgb.value; //0,0 is left-up
 
         noStroke();
         //var white = color(255,255,255,5+rgbw.w);
-        var white = color(5+rgbw.w,5+rgbw.w,5+rgbw.w,255);
-        var rgb = color(rgbw.r,rgbw.g,rgbw.b,255);
+        //var white = color(5+rgbw.w,5+rgbw.w,5+rgbw.w,255);
+        var rgbTemp = color(rgb.r,rgb.g,rgb.b);
  
         //fill(rgb);
         //ellipse(x*ratio, y, 7);
-        fill(white);
-        ellipse(x*ratio, y, 7);
+        fill(rgbTemp);
+        //ellipse(x*ratio, y, 7);
+        ellipse(x, y, 7);
     }   
+}
+
+function drawLine(){
+  //let ratio = w/dataWindowWidth;
+
+  for(let i = 0; i < (dataWindowWidth-1); i++){
+      let index = data.offset+i;
+
+      if(data.length <= index){
+        return;
+      }
+
+      let xZero = i;
+      let rgbZero = getRGB(index);
+      let yZero = h/2 - rgbZero.value; //0,0 is left-up
+
+      let xOne = i+1;
+      let rgbOne = getRGB(index+1);
+      let yOne = h/2 - rgbOne.value; //0,0 is left-up
+
+      //noStroke();
+      stroke(255);
+      strokeWeight(1);
+
+      //line(xZero*ratio, yZero, xOne*ratio, yOne);
+      line(xZero, yZero, xOne, yOne);
+  }   
 }
 
 function drawColors(){
@@ -219,6 +264,70 @@ function getRGBW(dataPos){
   return rgbw;
 }
 
+function getRGB(dataPos){
+  var rgb={r:127,g:127,b:127,value:0};
+  var value = data.array[dataPos];
+  var base = (data.basePressure + data.basePressureAdjust);
+  var diff = value - base;
+  //console.log("data:"+value+" base:"+base+" diff:"+diff);
+  rgb.value = diff*data.ratio;
+  //console.log("ratio:"+data.ratio);
+
+  //console.log("value:"+rgb.value);
+
+  /*
+  if(rgb.value <= data.cool.peak){
+    rgb.r = data.cool.r;
+    rgb.g = data.cool.g;
+    rgb.b = data.cool.b;
+  }else if(data.warm.peak <= rgb.value){
+    rgb.r = data.warm.r;
+    rgb.g = data.warm.g;
+    rgb.b = data.warm.b;
+  }else{
+    var ratio = float(rgb.value - data.cool.peak) / float(data.warm.peak - data.cool.peak);
+    rgb.r = parseInt(lerp(data.cool.r,data.warm.r,ratio));
+    rgb.g = parseInt(lerp(data.cool.g,data.warm.g,ratio));
+    rgb.b = parseInt(lerp(data.cool.b,data.warm.b,ratio));
+  }
+    */
+
+
+  /*
+  if(isNewColor){
+    brightnessRatioWhite = value / data.peakWhite;
+    brightnessWhite = 127.0 + 127.0 * brightnessRatioWhite;
+
+  }else{
+    brightnessRatioWhite = Math.abs(value) / data.peakWhite;
+    brightnessWhite = 255.0 * brightnessRatioWhite;
+  }
+  */
+
+  //lerp(a, b, 0.2);
+
+  /*
+  let brightnessRatioRGB = Math.abs(value) / data.peakRGB;
+  if(brightnessRatioRGB>1){
+    brightnessRatioRGB=1.0;
+  }
+
+  if(value >= 0){
+    rgb = data.warm;
+  }else{
+    rgb = data.cool;
+  }
+
+  rgbw.r= check(rgb.r * brightnessRatioRGB);
+  rgbw.g= check(rgb.g * brightnessRatioRGB);
+  rgbw.b= check(rgb.b * brightnessRatioRGB);
+  
+  rgbw.value = value;
+  */
+
+  return rgb;
+}
+
 function check(val){
   if(val>255.0){
     return 255.0;
@@ -227,6 +336,12 @@ function check(val){
     return 0.0;
   }
   return val;
+}
+
+function drawBaseCenterLine(){
+  strokeWeight(1);
+  stroke(30);
+  line(0, h/2, w, h/2);
 }
 
 function drawCursorLine(){
@@ -289,6 +404,11 @@ const onColor = (e) =>{
   //var ratioTemp = e.target.value / 1000.0;
   isNewColor = checkElem.checked;
   console.log("onColor");
+}
+
+const onBaseAdjust = (e) =>{
+  //var ratioTemp = e.target.value / 1000.0;
+  data.basePressureAdjust = parseFloat(e.target.value);
 }
 
 const onRatio = (e) =>{
@@ -375,7 +495,9 @@ function openFileOne(){
             var value = readerEvent.target.result; // this is the content!
             //rawData = value.replace("�", "");
             data = JSON.parse(value);
+            data.ratio = 1;
             data.offset = 0;
+            data.basePressureAdjust = 0;
             //data.brightnessWhite = h/4;
             //data.brightnessRGB = h/4;
             data.warm = {};
@@ -386,12 +508,14 @@ function openFileOne(){
             data.cool.r = 127;
             data.cool.g = 255;
             data.cool.b = 255;
+            /*
             data.peakWhite = 127;
             data.peakRGB = 127;
             peakWhiteElem.max = h/2;
             peakWhiteElem.value = data.peakWhite;
             peakRGBElem.max = h/2;
             peakRGBElem.value = data.peakRGB;
+            */
             state = "loaded";
             //console.log( content );
             //process();
@@ -415,7 +539,7 @@ function openFileTwo(){
 
         // here we tell the reader what to do when it's done reading...
         reader.onload = readerEvent => {
-
+            console.log("reader.onload");
             var value = readerEvent.target.result; // this is the content!
             //rawData = value.replace("�", "");
             data = JSON.parse(value);

@@ -1,14 +1,17 @@
 var data = {};
 var state = "init"
 
-let dataWindowWidth= 2000;
-let w = 1000;
+
+var fps = 20;
+
+let w = fps*120;
+let dataWindowWidth= fps*120;
 let h = 500;
 //let hPlus = 50;
 //let offset = 0;
 //let offsetMax = 0;
 
-var fps = 20;
+
 var dataPlayPos= 0;//0 to w
 
 var ratioElem,offsetElem,warmPeakElem,coolPeakElem,warmElem,coolElem,checkElem,whiteMaxElem,whiteMinElem,baseAdjustElem;

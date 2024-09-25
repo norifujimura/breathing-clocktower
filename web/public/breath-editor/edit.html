@@ -41,12 +41,16 @@
       </div>
       <div class="card-body">
         <button type="button" class="btn btn-primary" id="openFileButton" onclick=openFileOne()>Open v1 json file</button>
+        <button type="button" class="btn btn-success" id="openFileButton" onclick=saveData()>Save v2 json file</button>
+        <!--
+        <button type="button" class="btn btn-primary" id="openFileButton" onclick=openFileOne()>Open v1 json file</button>
         <button type="button" class="btn btn-success" id="openFileButton" onclick=saveFileTwo()>Save v2 json file</button>
         <button type="button" class="btn btn-primary" id="openFileButton" onclick=openFileTwo()>Open v2-3 json file</button>
         <button type="button" class="btn btn-success" id="openFileButton" onclick=saveFileThree()>Save v3 json file</button>
         <button type="button" class="btn btn-info" id="one" onclick=connect(true)>ConnectBLEOne</button>
         <button type="button" class="btn btn-info" id="two" onclick=connect(false)>ConnectBLETwo</button>
         <button type="button" class="btn btn-success" id="openFileButton" onclick=saveData()>Save 2000 RGBW txt file</button>
+      -->
       </div>
       <div class="card-body">
         <!--
@@ -75,7 +79,7 @@
         </div>
         <div>
           <label for="ratio" class="form-label" id="ratiotLabel">Ratio</label>
-          <input type="range" class="form-range" value = "1" min="0.1" max="10.0" step ="0.01" id="ratio">
+          <input type="range" class="form-range" value = "1" min="0.1" max="20.0" step ="0.01" id="ratio">
         </div>
         <div>
           <label for="offset" class="form-label" id="offsetLabel">Offset</label>

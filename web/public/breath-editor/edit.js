@@ -1,4 +1,5 @@
 var data = {};
+
 var state = "init"
 
 
@@ -6,7 +7,7 @@ var fps = 20;
 
 let w = fps*120;
 let dataWindowWidth= fps*120;
-let h = 500;
+let h = 512;
 //let hPlus = 50;
 //let offset = 0;
 //let offsetMax = 0;
@@ -60,14 +61,17 @@ function setup(){
     isNewColor = true;
     
     data.ratio = 1.0;
+
+    /*
     data.white = {};
     data.white.max = 500;
     data.white.min = 0;
+    */
 
     data.warm = {};
-    data.warm.peak = 500;
+    //data.warm.peak = 500;
     data.cool = {};
-    data.cool.peak = 0;
+    //data.cool.peak = 0;
     
     //data.white.max = 500;
     //data.white.min = 0;
@@ -135,11 +139,15 @@ function showParameters(){
 function drawDots(){
     //let ratio = w/dataWindowWidth;
 
-    for(let i = 0; i < dataWindowWidth; i++){
+    for(let i = 0; i < w; i++){
         let dataPos  = i+data.offset;
         let x = i;
-        let rgb = getRGB(dataPos);
+        let rgb = getRGB2(dataPos);
+        //vaue shall be 128 to -128
         let y = h/2 - rgb.value; //0,0 is left-up
+        var v = round(rgb.value);
+        console.log("value:"+v + "r:"+rgb.r+ "g:"+rgb.g+ "b:"+rgb.b);
+
 
         noStroke();
         //var white = color(255,255,255,5+rgbw.w);
@@ -157,19 +165,21 @@ function drawDots(){
 function drawLine(){
   //let ratio = w/dataWindowWidth;
 
-  for(let i = 0; i < (dataWindowWidth-1); i++){
+  for(let i = 0; i < (w-1); i++){
       let index = data.offset+i;
 
+      /*
       if(data.length <= index){
         return;
       }
+        */
 
       let xZero = i;
-      let rgbZero = getRGB(index);
+      let rgbZero = getRGB2(index);
       let yZero = h/2 - rgbZero.value; //0,0 is left-up
 
       let xOne = i+1;
-      let rgbOne = getRGB(index+1);
+      let rgbOne = getRGB2(index+1);
       let yOne = h/2 - rgbOne.value; //0,0 is left-up
 
       //noStroke();
@@ -201,6 +211,49 @@ function drawWhite(){
     
     fill(c);
     rect(0, h, w,hPlus/2);
+}
+
+function getRGB2(dataPos){
+
+  if(dataPos>data.array.length){
+    dataPos = dataPos - data.array.length;
+  }
+  var rgb={r:127,g:127,b:127,value:0};
+  var value = data.array[dataPos];
+  var base = (data.basePressure + data.basePressureAdjust);
+  var diff = value - base;
+  //console.log("data:"+value+" base:"+base+" diff:"+diff);
+  var value = diff*data.ratio;
+  rgb.value = value;
+  //console.log("ratio:"+data.ratio);
+
+  //console.log("value:"+rgb.value);
+
+   //vaue shall be 128 to -128
+
+  if(value< -128){
+    value = -128;
+  }
+
+  if(value>128){
+    value = 128;
+  }
+
+  if(0<value){
+  //warm
+    var ratio = value/128;
+    rgb.r = round(data.warm.r * ratio);
+    rgb.g = round(data.warm.g * ratio);
+    rgb.b = round(data.warm.b * ratio);
+  }else{
+  //cool
+    var ratio = value/128 * -1;
+    rgb.r = round(data.cool.r * ratio);
+    rgb.g = round(data.cool.g * ratio);
+    rgb.b = round(data.cool.b * ratio);
+  }
+
+  return rgb;
 }
 
 function getRGBW(dataPos){
@@ -424,6 +477,7 @@ const onOffset = (e) =>{
     data.offset = parseInt(data.length * ratio);
 }
 
+/*
 const onWhiteMax = (e) =>{
   data.white.max = parseInt(e.target.value);
 }
@@ -439,6 +493,7 @@ const onWarmPeak = (e) =>{
 const onCoolPeak = (e) =>{
   data.cool.peak= parseInt(e.target.value);
 }
+  */
 
 const onWarm = (e) =>{
     data.warm.hex = e.target.value;
@@ -597,17 +652,38 @@ function saveJson(json) {
 }
 
 function saveData(){
+  var dataTwo = {};
+  dataTwo.version = 2;
+  dataTwo.array = [];
+  dataTwo.fileName = data.fileName;
+  dataTwo.text = data.text;
+
+  for(let i = 0; i < w; i++){
+    let dataPos  = i+data.offset;
+    let x = i;
+    let rgb = getRGB2(dataPos);
+    dataTwo.array.push(rgb)
+  }  
+
+  var fileName = data.fileName+".json";
+
+  var json = JSON.stringify(dataTwo);
+  const blob = new Blob([json],{type:"application/json"});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+  link.click();
+
+}
+
+
+/*
+function saveData(){
     var text = "";
 
     for(let i = 0; i < dataWindowWidth; i++){
         let dataPos  = data.offset+i;
         let rgbw = getRGBW(dataPos);
-        /*
-        let rTwo = rgbw.r.toFixed(3);
-        let gTwo = rgbw.g.toFixed(3);
-        let bTwo = rgbw.b.toFixed(3);
-        let wTwo = rgbw.w.toFixed(3);
-        */
 
         let rTwo = Math.round(rgbw.r);
         let gTwo = Math.round(rgbw.g);
@@ -619,6 +695,7 @@ function saveData(){
 
     saveString(text);
 }
+*/
 
 function saveString(string) {
     //const d = new Date();

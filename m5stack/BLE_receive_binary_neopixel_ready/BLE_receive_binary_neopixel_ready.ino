@@ -36,9 +36,12 @@ uint8_t buf[ledLength * 3];
 //
 
 int value;
+int x;
+int y;
 int r;
 int g;
 int b;
+int rw,gw,bw,ww;
 int brightness;
 
 bool isReceived = false;

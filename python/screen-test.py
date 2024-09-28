@@ -20,10 +20,18 @@ CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8" # CHARACTERISTIC_UU
 
 x = 0
 y = 0
+screen = 0
 minute = 0
 state = "none"
 previousState = "none"
 json_data = 0
+image = 0
+counter = 0
+font =0
+font_s= 0
+r = 0
+g = 0
+b = 0
 
 async def say_after(delay, what):
     print(f"prepare {what} at {time.strftime('%X')}")
@@ -50,9 +58,10 @@ async def ble_byte_reconnect(address,delay):
             while True:
 
                 #message = bytearray( b'\x30\x30')
-                message = bytearray(2)
-                message[0] = x
-                message[1] = y
+                message = bytearray(3)
+                message[0] = r
+                message[1] = g 
+                message[b] = b
                 # return rateを1 Hzに設定
                 try:
                     await client.write_gatt_char(CHARACTERISTIC_UUID,message,response=True)
@@ -113,12 +122,13 @@ async def ble_json(address,delay):
             await asyncio.sleep(delay)
 
 def stateCheck():
-    global minute,state,previousState,json_data
+    global minute,state,previousState,json_data,image,counter
     previousState = state
+    '''
     if 0<=minute and minute<=3:
         state = "azabu-chihiro"
     if 4<=minute and minute<=7:
-        state = "azabu-haruhitoc"
+        state = "azabu-haruhito"
     if 8<=minute and minute<=11:
         state = "azabu-miharu"
     if 12<=minute and minute<=15:
@@ -143,52 +153,200 @@ def stateCheck():
         state = "roppongi-takenari"
     if 52<=minute and minute<=59:
         state = "roppongi-tatsuo"
+        '''
+    
+    if 0<=minute and minute<=1:
+        state = "azabu-chihiro"
+    if 2<=minute and minute<=3:
+        state = "azabu-haruhito"
+    if 4<=minute and minute<=5:
+        state = "azabu-miharu"
+    if 6<=minute and minute<=7:
+        state = "azabu-ohana"
+    if 8<=minute and minute<=9:
+        state = "azabu-sae"
+    if 10<=minute and minute<=11:
+        state = "minato-kaito"
+    if 12<=minute and minute<=13:
+        state = "minato-maiko"
+    if 14<=minute and minute<=15:
+        state = "minato-taito"
+    if 16<=minute and minute<=17:
+        state = "minato-yohko"
+    if 18<=minute and minute<=19:
+        state = "roppongi-hiroyuki"
+    if 20<=minute and minute<=21:
+        state = "roppongi-kyousei"
+    if 22<=minute and minute<=23:
+        state = "roppongi-masahiko"
+    if 24<=minute and minute<=25:
+        state = "roppongi-takenari"
+    if 26<=minute and minute<=29:
+        state = "roppongi-tatsuo"
+
+    if 30<=minute and minute<=31:
+        state = "azabu-chihiro"
+    if 32<=minute and minute<=33:
+        state = "azabu-haruhito"
+    if 34<=minute and minute<=35:
+        state = "azabu-miharu"
+    if 36<=minute and minute<=37:
+        state = "azabu-ohana"
+    if 38<=minute and minute<=39:
+        state = "azabu-sae"
+    if 40<=minute and minute<=41:
+        state = "minato-kaito"
+    if 42<=minute and minute<=43:
+        state = "minato-maiko"
+    if 44<=minute and minute<=45:
+        state = "minato-taito"
+    if 46<=minute and minute<=47:
+        state = "minato-yohko"
+    if 48<=minute and minute<=49:
+        state = "roppongi-hiroyuki"
+    if 50<=minute and minute<=51:
+        state = "roppongi-kyousei"
+    if 52<=minute and minute<=53:
+        state = "roppongi-masahiko"
+    if 54<=minute and minute<=55:
+        state = "roppongi-takenari"
+    if 55<=minute and minute<=59:
+        state = "roppongi-tatsuo"
 
     if previousState != state:
         loadJson()
+        image = pygame.image.load("python/images/"+state+".jpeg")
+        image = pygame.transform.smoothscale(image, (1920, 1500)) 
+        image.set_alpha(45)
+        counter = 0
 
 def loadJson():
     global state,json_data
-    with open("data/"+state+".json") as json_file:
+    with open("python/data/"+state+".json") as json_file:
         json_data = json.load(json_file)
         pprint(json_data)
 
+def drawCursor():
+    global counter,screen
+
+    pygame.draw.line(screen, (0,0,0), (0,540), (1920,540), 1)
+    pygame.draw.line(screen, (255,255,255), (counter,0), (counter,1080), 1)
+
+def drawLines():
+    global counter,screen,json_data
+    for i in range(0,counter):
+        center = 540
+        point1 = json_data['array'][i]
+        point2 = json_data['array'][i+1]
+        value1 =0
+        value2 = 0
+        if point1['value'] is not None:
+            value1 = float(point1['value']) * -1.2 + center
+        if point2['value'] is not None:
+            value2 = float(point2['value']) * -1.2 + center
+        pygame.draw.aaline(screen, (255,255,255), (i,value1), (i+1,value2), 1)
+
+def drawPoints():
+    global counter,screen,json_data
+    for i in range(0,counter):
+        center = 540
+        point1 = json_data['array'][i]
+        #point2 = json_data['array'][i+1]
+
+        value1 =0
+        r =0
+        g =0
+        b =0
+
+        if point1['value'] is not None:
+            value1 = float(point1['value']) * -1.2 + center
+            r = int(point1['r']) 
+            g = int(point1['g']) 
+            b = int(point1['b']) 
+            pygame.draw.circle(screen, (r,g,b), (i,value1),5)
+    
+        #value2 = float(point2['value']) * 1.2 + center
+        #pygame.draw.aaline(screen, (255,255,255), (i,value1), (i+1,value2), 1)
+
+def drawGuide():
+    global font_s,counter,screen,json_data
+    center = 540
+    
+    point1 = json_data['array'][counter]
+    
+    if point1['value'] is not None:
+        value1 = float(point1['value']) * -1.2 + center
+        text = 0
+        if value1<center:
+            text = font_s.render(f'吐く息/exhale bless', True, (200,200,200))
+        else:
+            text = font_s.render(f'吸う息/inhale bless', True, (200,200,200))
+
+        screen.blit(text, [counter+5,value1])      
+    
+
+
 
 async def pygame_loop(delay):
-    global x,y,minute,state,json_data
+    global x,y,font,font_m,font_s,screen,minute,state,json_data,image,counter,r,g,b
     fullscreen = False
     pygame.init() # 初期化
-    screen = pygame.display.set_mode((2400,600)) # ウィンドウサイズの指定
+    screen = pygame.display.set_mode((1920,1080)) # ウィンドウサイズの指定
     pygame.display.set_caption("Breathing Clocktower") # ウィンドウの上の方に出てくるアレの指定
-    font = pygame.font.Font('fonts/NotoSansJP-Medium.ttf', 30)
+    font = pygame.font.Font('python/fonts/NotoSansJP-Medium.ttf', 60)
+    font_m = pygame.font.Font('python/fonts/NotoSansJP-Medium.ttf', 40)
+    font_s = pygame.font.Font('python/fonts/NotoSansJP-Medium.ttf', 20)
     #minute = 0
     
     while(True):
+        counter+=1
+        if 1920<counter:
+            counter = 0
+
+        length = len(json_data['array'])
+        point = json_data['array'][counter]
+        value = point['value']
+        r = point['r']
+        g = point['g']
+        b = point['b']
+
         minute = dt.now().minute
 
         stateCheck()
 
         pygame.display.update()
+
         mouseX, mouseY = pygame.mouse.get_pos()
         text = font.render(f'{mouseX}, {mouseY}', True, (127,127,127))
         #text_jp = json_data['text']
         #text_e = json_data['text-e']
+
         text_jp=json_data['text']
         text_e=json_data['text-e']
-        text_jp_print = font.render(f'{text_jp}', True, (255,255,255))
-        text_e_print = font.render(f'{text_e}', True, (255,255,255))
-        text2 = font.render(f'日本語:{minute}:{state}', True, (255,255,255))
+        text_jp_print = font.render(f'{text_jp}', True, (200,200,200))
+        text_e_print = font_m.render(f'{text_e}', True, (200,200,200))
+
+        text_rect_jp = text_jp_print.get_rect(center=(1920/2,900))
+        text_rect_e = text_e_print.get_rect(center=(1920/2,970))
+
+        text2 = font.render(f'日本語:{minute}:{state}:{counter}:{length}:{value}:{r}:{g}:{b}', True, (255,255,255))
         screen.fill((0,0,0))
-        screen.blit(text, [0,0])
-        screen.blit(text2, [0, 100])
-        screen.blit(text_jp_print, [0, 200])
-        screen.blit(text_e_print, [0, 240])
-        pygame.draw.line(screen, (127,127,127), (mouseX,0), (mouseX,120), 1)
-        pygame.draw.line(screen, (127,127,127), (0,mouseY), (120,mouseY), 1)
+        screen.blit(image,(0,-100))
+        #screen.blit(text, [0,0])
+        #screen.blit(text2, [0, 100])
+        screen.blit(text_jp_print,text_rect_jp)
+        screen.blit(text_e_print, text_rect_e)
+        drawLines()
+        drawPoints()
+        drawCursor()
+        drawGuide()
+        #pygame.draw.line(screen, (255,255,255), (counter,0), (counter,1080), 1)
+        #pygame.draw.line(screen, (127,127,127), (mouseX,0), (mouseX,120), 1)
+        #pygame.draw.line(screen, (127,127,127), (0,mouseY), (120,mouseY), 1)
         pygame.display.flip()
         #pygame.display.update() # 画面更新
-        x = mouseX
-        y = mouseY
+        #x = mouseX
+        #y = mouseY
 
         for event in pygame.event.get(): # 終了処理
             if event.type == QUIT:
@@ -201,7 +359,7 @@ async def pygame_loop(delay):
                     if fullscreen:
                         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
                     else:
-                        screen = pygame.display.set_mode((800, 600))
+                        screen = pygame.display.set_mode((1920, 1080))
         await asyncio.sleep(delay)
 
 async def main():
@@ -209,10 +367,10 @@ async def main():
 
     stateCheck()
 
-    task1 = asyncio.create_task(my_loop(1, 'hello'))
-    task2 = asyncio.create_task(my_loop(2, 'world'))
-    task3 = asyncio.create_task(pygame_loop(0.02))
-    task4 = asyncio.create_task(ble_byte_reconnect(address,0.02))
+    #task1 = asyncio.create_task(my_loop(1, 'hello'))
+    #task2 = asyncio.create_task(my_loop(2, 'world'))
+    task1 = asyncio.create_task(pygame_loop(0.02))
+    task2 = asyncio.create_task(ble_byte_reconnect(address,0.02))
 
 
     print(f"started at {time.strftime('%X')}")
@@ -222,7 +380,6 @@ async def main():
     print(f"returned from await task1 at {time.strftime('%X')}")
 
     await task2
-    await task3
 
     print(f"finished at {time.strftime('%X')}")
     #asyncio.run(run(renderer="vispy",frame_rate=20))

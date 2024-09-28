@@ -5,7 +5,8 @@ import asyncio
 from ctypes import *
 from bleak import BleakClient
 
-address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+#address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+address = "24:58:7C:5C:83:DD"
 CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8" # CHARACTERISTIC_UUID
 
 state = 'init' # init, bleconnected
@@ -109,8 +110,9 @@ async def ble(address, loop):
         print(f"Connected: {is_connected}")
 
         message = {
-            "x":x,
-            "y":y
+            "r":x,
+            "g":y,
+            "b":0
         }
         masseage_b = json.dumps(message).encode('utf-8')
 

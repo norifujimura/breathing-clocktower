@@ -107,8 +107,9 @@ async def ble_json(address,delay):
 
 async def pygame_loop(delay):
     global x,y
+    fullscreen = False
     pygame.init() # 初期化
-    screen = pygame.display.set_mode((120,120)) # ウィンドウサイズの指定
+    screen = pygame.display.set_mode((800,600)) # ウィンドウサイズの指定
     pygame.display.set_caption("Pygame Test") # ウィンドウの上の方に出てくるアレの指定
     font = pygame.font.Font(None, 30)
     
@@ -129,6 +130,14 @@ async def pygame_loop(delay):
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+                    # Toggle fullscreen when F11 is pressed
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F11:
+                    fullscreen = not fullscreen
+                    if fullscreen:
+                        screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                    else:
+                        screen = pygame.display.set_mode((800, 600))
         await asyncio.sleep(delay)
 
 async def main():

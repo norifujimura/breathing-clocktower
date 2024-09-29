@@ -14,7 +14,8 @@ from bleak import BleakClient
 
 from datetime import datetime as dt
 
-address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+#address = "19C40D9B-F748-1109-CF66-67D6BB739283" # 通信先のMacアドレス
+address = "24:58:7C:5C:83:DD"
 CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8" # CHARACTERISTIC_UUID
 
 
@@ -60,8 +61,8 @@ async def ble_byte_reconnect(address,delay):
                 #message = bytearray( b'\x30\x30')
                 message = bytearray(3)
                 message[0] = r
-                message[1] = g 
-                message[b] = b
+                message[1] = g                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                message[2] = b
                 # return rateを1 Hzに設定
                 try:
                     await client.write_gatt_char(CHARACTERISTIC_UUID,message,response=True)
@@ -369,8 +370,8 @@ async def main():
 
     #task1 = asyncio.create_task(my_loop(1, 'hello'))
     #task2 = asyncio.create_task(my_loop(2, 'world'))
-    task1 = asyncio.create_task(pygame_loop(0.02))
-    task2 = asyncio.create_task(ble_byte_reconnect(address,0.02))
+    task1 = asyncio.create_task(pygame_loop(0.05))
+    task2 = asyncio.create_task(ble_byte_reconnect(address,0.05))
 
 
     print(f"started at {time.strftime('%X')}")

@@ -26,21 +26,9 @@ void showLED(){
 }
 
 void showLEDBytes(){
-  if(mode == "white"){
-    for(int i=0; i<ledLength ;i++){
-
-      uint32_t  c = strip.Color(0,0,0,buf[i]);
+  for(int i=0; i<ledLength ;i++){
+      uint32_t  c = getRGBW2(r,g,b,1.0);
       strip.setPixelColor(i, c);         //  Set pixel's color (in RAM)
-    }
-  }else if(mode == "rgb"){
-    for(int i=0; i<ledLength ;i++){
-      int r = buf[i*3];
-      int g = buf[i*3+1];
-      int b = buf[i*3+2];
-      //uint32_t  c = strip.Color(r,g,b,0);
-      uint32_t  c = getRGBW(r,g,b);
-      strip.setPixelColor(i, c);         //  Set pixel's color (in RAM)
-    }
   }
 
   strip.show(); 

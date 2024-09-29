@@ -38,9 +38,9 @@ uint8_t buf[ledLength * 3];
 int value;
 int x;
 int y;
-int r;
-int g;
-int b;
+int r=0;
+int g=10;
+int b=0;
 int rw,gw,bw,ww;
 int brightness;
 
@@ -146,7 +146,7 @@ void setup() {
   M5.begin();
   M5.Lcd.fillScreen(BLACK);
   Serial.begin(115200);
-  //setupLED();
+  setupLED();
 
   value = 0;
 
@@ -197,5 +197,9 @@ void loop() {
     showLEDBytes();
     isReceived = false;
   }
+
+        uint16_t c= 0;
+      c = M5.Lcd.color565(r,g,b);
+  M5.Lcd.fillRect(0, 0, 120, 120, c); 
 
 }

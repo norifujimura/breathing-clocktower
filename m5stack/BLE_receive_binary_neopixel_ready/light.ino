@@ -59,7 +59,7 @@ uint32_t getRGBW2(int r,int g,int b,float ratio){
     uint32_t  c = strip.Color(rw,gw,bw,ww);
     return c;
   }else if(b<=r && b<=g){
-    int w = r;
+    int w = b;
     r = r-w;
     g = g-w;
     b = 0;

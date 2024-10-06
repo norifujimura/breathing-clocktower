@@ -330,13 +330,21 @@ async def pygame_loop(delay):
         text_rect_jp = text_jp_print.get_rect(center=(1920/2,900))
         text_rect_e = text_e_print.get_rect(center=(1920/2,970))
 
-        text2 = font.render(f'日本語:{minute}:{state}:{counter}:{length}:{value}:{r}:{g}:{b}', True, (255,255,255))
+        add_jp = font_s.render(f'この呼吸データは、六本木で暮らし、働くひとたち１４人に、事前にインタービューと共に実際の呼吸のデータを採取させていただいたものを再生しています。', True, (200,200,200))
+        add_e= font_s.render(f'This data of bleathing are pre-recoreded ones  when the artist interviewed 14 local residents of Roppongi.', True, (200,200,200))
+
+        add_rect_jp = add_jp.get_rect(center=(1920/2,200))
+        add_rect_e = add_e.get_rect(center=(1920/2,240))
+
+        #text2 = font.render(f'日本語:{minute}:{state}:{counter}:{length}:{value}:{r}:{g}:{b}', True, (255,255,255))
         screen.fill((0,0,0))
         screen.blit(image,(0,-100))
-        #screen.blit(text, [0,0])
-        #screen.blit(text2, [0, 100])
+        screen.blit(add_jp, add_rect_jp)
+        screen.blit(add_e, add_rect_e)
         screen.blit(text_jp_print,text_rect_jp)
         screen.blit(text_e_print, text_rect_e)
+        #screen.blit(text2, [0, 100])
+        
         drawLines()
         drawPoints()
         drawCursor()
